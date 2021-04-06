@@ -9,6 +9,7 @@ export default function TestForm({ callMethod, setProposals }) {
   return (
     <>
       <hr />
+      <button onClick={() => callMethod('getVoters')}>get voters</button>
       <button onClick={handleGetList}>get list</button>
       <button onClick={() => callMethod('getProposal', 0)}>
         get first poropsal

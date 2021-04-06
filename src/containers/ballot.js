@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { useEffect, useState } from 'react';
 import web3 from 'web3';
 import { Web3ReactProvider, useWeb3React } from '@web3-react/core';
@@ -20,18 +21,21 @@ import {
 import { useLocation, useParams } from 'react-router-dom';
 import { FormProvider, useForm, Controller } from 'react-hook-form';
 import { useEagerConnect, useContract, useContractCallData } from '../hooks';
-import BallotContract from '../contract_build/Ballot.json';
+import BallotContract from '../contract_build/Ballot2.json';
 
 export default function Ballot() {
   const [question, setQuestion] = useState(null);
   const [proposals, setProposals] = useState(null);
   const [votingStatus, setVotingStatus] = useState(null);
   const [checkedProposal, setCheckedPropsal] = useState(null);
+  const [voterStatus, setVoterStatus] = useState(false);
+  const [voters, setVoters] = useState(false);
   const [loading, setLoading] = useState(true);
   const params = useParams();
   const contract = useContract(BallotContract, params?.address);
 
   useEffect(async () => {
+    // eslint-disable-line
     setLoading(true);
     const tmpQuestion = await contract?.getQuestion();
     const tmpProposals = await contract?.getList();
@@ -53,21 +57,32 @@ export default function Ballot() {
       })
     );
     setLoading(false);
-  }, [contract]);
+  }, [contract, voterStatus]);
 
   const handleVote = async () => {
     setLoading(true);
     console.log('handleVote');
     const tx = await contract?.vote(checkedProposal);
-    console.log('result', tx);
+    console.log('tx', tx);
     await tx.wait();
+    setVoterStatus(true);
+    setLoading(false);
+  };
+
+  const handleShowVoters = async () => {
+    setLoading(true);
+    console.log('handleShowVoters');
+    const voters = await contract?.getVoters();
+    setVoters(voters);
     setLoading(false);
   };
 
   console.log('votingStatus', votingStatus);
   console.log('proposals', proposals);
 
-  const sum = proposals ? proposals.reduce((acc, p) => parseInt(p.count) + acc, 0) : 0;
+  const sum = proposals
+    ? proposals.reduce((acc, p) => parseInt(p.count) + acc, 0)
+    : 0;
 
   return (
     <>
@@ -80,16 +95,16 @@ export default function Ballot() {
           <>
             <List>
               {proposals.map((p) => (
-                  <List.Item key={p.id}>
-                    <Radio
-                      name="proposal"
-                      label={`${p.name}`}
-                      value={p.id}
-                      onChange={() => setCheckedPropsal(p.id)}
-                      checked={p.id === checkedProposal}
-                    />
-                  </List.Item>
-                ))}
+                <List.Item key={p.id}>
+                  <Radio
+                    name="proposal"
+                    label={`${p.name}`}
+                    value={p.id}
+                    onChange={() => setCheckedPropsal(p.id)}
+                    checked={p.id === checkedProposal}
+                  />
+                </List.Item>
+              ))}
             </List>
             <Button disable={!checkedProposal} onClick={handleVote}>
               Vote
@@ -102,8 +117,24 @@ export default function Ballot() {
             {proposals &&
               proposals.map((p) => {
                 const percent = 100 / (sum / p.count);
-                return <Progress percent={Math.floor(percent * 100) / 100} progress>{p.name}</Progress>
+                return (
+                  <Progress percent={Math.floor(percent * 100) / 100} progress>
+                    {p.name}
+                  </Progress>
+                );
               })}
+            <hr />
+            {!voters && <Button onClick={handleShowVoters}>show voters</Button>}
+            {voters && (
+              <>
+                <h4>Voters</h4>
+                <List>
+                  {voters.map((p) => (
+                    <List.Item key={p}>{p}</List.Item>
+                  ))}
+                </List>
+              </>
+            )}
           </>
         )}
       </Form>

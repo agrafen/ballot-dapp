@@ -1,26 +1,20 @@
-import { useEffect, useState } from 'react';
-import web3 from 'web3';
-import { Web3ReactProvider, useWeb3React } from '@web3-react/core';
-import { Web3Provider } from '@ethersproject/providers';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ethers } from 'ethers';
 import {
   Button,
   Form,
-  Grid,
   Icon,
-  Header,
-  Image,
   Input,
-  Message,
-  Segment,
   Dimmer,
   Loader,
 } from 'semantic-ui-react';
-import { FormProvider, useForm, Controller } from 'react-hook-form';
+import { FormProvider, useForm } from 'react-hook-form';
 import { IsConnectedWallet } from '../utils';
 import { useCreateContract } from '../hooks';
-import BallotContract from '../contract_build/Ballot.json';
+import BallotContract from '../contract_build/Ballot2.json';
+// import BallotSol from '../../contracts/Ballot.sol';
+// import CounterContract from '../contract_build/Ballot.json';
 
 let indexAnswers = 1;
 
@@ -48,7 +42,7 @@ export default function NewBallotForm() {
 
     const address = await signer.getAddress();
     console.log('signer.getAddress()', address);
-    const contract = await deployerBallotContract.deploy(question, answers);
+    const contract = await deployerBallotContract.deploy(question, answers, false);
     console.log('contract', contract);
     try {
       console.log('contract address', contract.address);
@@ -101,6 +95,7 @@ export default function NewBallotForm() {
                 <Input
                   placeholder="..."
                   name={a}
+                  // input={{ ref: register }}
                   input={{ ref: register({ required: true }) }}
                   label={
                     <Button onClick={() => handleDeleteProposal(a)}>
@@ -125,7 +120,7 @@ export default function NewBallotForm() {
           {newBallotContractAddress && (
             <p>
               You ballot address:{' '}
-              <Link to={`/${newBallotContractAddress}`}>
+              <Link to={`/${newBallotContractAddress}`}/*  target="_blank" */>
                 {newBallotContractAddress}
               </Link>
             </p>

@@ -1,49 +1,47 @@
 // SPDX-License-Identifier: UNLICENSED
-// pragma solidity >=0.7.0 <0.8.0;
 pragma solidity >=0.5.0 <0.7.0;
-// pragma abicoder v2;
 pragma experimental ABIEncoderV2;
-
-// import './Base.sol';
 
 library Lib {
     struct Voting {
         uint8 proposalId;
         bool exist;
     }
+    
+    struct Voter {
+        address addr;
+        uint8 proposalId;
+    }
 }
 
-// contract Election is Base {
-contract Ballot {
+contract Ballot2 {
     address payable private owner;
     bytes32[] _proposals;
     bytes32 _test;
     bytes32 _question;
+    bool public _anon;
     
     struct Proposal {
         uint id;
         bytes32 name;
         uint count;
-        // string name;
     }
     
     Proposal[] public _proposalsStruct;
     
     mapping(address => Lib.Voting) voting;
+    Lib.Voter[] voters;
     
-    // ["fist", "second"]
-    constructor(bytes32 question, bytes32[] memory proposalNames) public {
-    // constructor(string memory test) {
+    constructor(bytes32 question, bytes32[] memory proposalNames, bool anon) public {
         _proposals = proposalNames;
         _question = question;
-        // _test = bytes32(test);
+        _anon = anon;
 
         owner = msg.sender;
         
         for (uint i = 0; i < proposalNames.length; i++) {
             _proposalsStruct.push(Proposal({
                 id: i,
-                // name: stringToBytes32(proposalNames[i]),
                 name: proposalNames[i],
                 count: 0
             }));
@@ -56,18 +54,27 @@ contract Ballot {
         _proposalsStruct[id].count++;
         voting[msg.sender].proposalId = id;
         voting[msg.sender].exist = true;
+        voters.push(Lib.Voter({
+            addr: msg.sender,
+            proposalId: id
+        }));
     }
 
     function getVotingStatus() public view returns(bool) {
       return voting[msg.sender].exist;
     }
     
-    function getTest() public view returns(bytes32) {
-        return _test;
-    }
-    
     function getList() public view returns(Proposal[] memory) {
         return _proposalsStruct;
+    }
+
+    function getVoters() public view returns(Lib.Voter[] memory) {
+        require(!_anon, 'This is anonymous ballot!');
+        return voters;
+    }
+    
+    function getTest() public view returns(bytes32) {
+        return _test;
     }
     
     function getQuestion() public view returns(bytes32) {
@@ -85,11 +92,6 @@ contract Ballot {
       }
     }
 
-    // function getProposalName(uint id) public view returns(string memory) {
-    //     require(id <= _proposalsStruct.length, 'Error1');
-    //     return bytes32ToString(_proposalsStruct[id].name);
-    // }
-    
     function kill() public {
         if (msg.sender == owner) {
             selfdestruct(owner);

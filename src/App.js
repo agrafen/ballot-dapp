@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import web3 from 'web3';
-import { Web3ReactProvider, useWeb3React } from '@web3-react/core';
+import { Web3ReactProvider } from '@web3-react/core';
 import { Web3Provider } from '@ethersproject/providers';
 import {
   BrowserRouter as Router,
@@ -8,21 +8,10 @@ import {
   Switch,
   Route,
   Link,
-  useRouteMatch,
-  useParams,
-  useLocation,
 } from 'react-router-dom';
 import {
-  Button,
-  Form,
   Grid,
-  Header,
-  Image,
-  Input,
-  Message,
-  Segment,
 } from 'semantic-ui-react';
-import { FormProvider, useForm, Controller } from 'react-hook-form';
 
 import 'semantic-ui-css/semantic.min.css';
 
@@ -30,9 +19,9 @@ import Ballot from './containers/ballot';
 import NewBallotForm from './containers/newBallotForm';
 import HomePage from './home';
 
-import { useEagerConnect, useContract, useContractCallData } from './hooks';
+import { useEagerConnect, useContract } from './hooks';
 
-import BallotContract from './contract_build/Ballot.json';
+import BallotContract from './contract_build/Ballot2.json';
 
 function getLibrary(provider) {
   const library = new Web3Provider(provider);
@@ -115,7 +104,6 @@ function App(props) {
 }
 
 export default function () {
-  // console.log('PRODUCTION', process.env.NODE_ENV);
   return (
     <Web3ReactProvider getLibrary={getLibrary}>
       <HashRouter>

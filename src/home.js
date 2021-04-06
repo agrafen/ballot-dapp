@@ -1,6 +1,5 @@
-import web3 from 'web3';
-import { Web3ReactProvider, useWeb3React } from '@web3-react/core';
-import { Web3Provider } from '@ethersproject/providers';
+/* eslint-disable no-unused-vars */
+import { useWeb3React } from '@web3-react/core';
 import { Link } from 'react-router-dom';
 
 import { isDevEnv, IsConnectedWallet } from './utils';
@@ -32,9 +31,13 @@ export default function HomePage({ triedEager, callMethod, setProposals }) {
           Create new ballot
         </Link>
       )}
-      {isDevEnv() && false && (
+      {isDevEnv() && (
         <TestForm callMethod={callMethod} setProposals={setProposals} />
       )}
+      <br />
+      <br />
+      <br />
+      <small>ver.0.1 //// 2020 (c) agrafen</small>
     </>
   );
 }

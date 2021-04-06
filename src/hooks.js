@@ -4,6 +4,8 @@ import { ethers } from "ethers";
 import { Contract } from '@ethersproject/contracts';
 import { injected } from './connectors';
 
+// console.log('ContractFactory', ContractFactory);
+
 export function useEagerConnect() {
   const { activate, active } = useWeb3React();
 
@@ -104,13 +106,19 @@ export function useCreateContract(Contract) {
   if (!account) {
     return [null, null];
   }
-
-  const signer = library.getSigner(account);
+  
+  const signer = library.getSigner(account); // .connectUnchecked();
   return [ethers.ContractFactory.fromSolidity(Contract, signer), signer]
 }
 
 export function useContract(contractJson, address) {
   const { chainId, library, account } = useWeb3React();
+
+  // if (!chainId || !contractJson.networks || !contractJson.networks[chainId]) {
+  // if (!chainId) {
+  //   return null;
+  // }
+
   const signer = useMemo(() => chainId ? library.getSigner(account).connectUnchecked() : null, [chainId]);
 
   const contract = useMemo(() => {

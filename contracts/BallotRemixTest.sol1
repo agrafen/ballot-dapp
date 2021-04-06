@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: UNLICENSED
-// pragma solidity >=0.7.0 <0.8.0;
-pragma solidity >=0.5.0 <0.7.0;
+pragma solidity >=0.7.0 <0.8.0;
+//pragma solidity >=0.5.0 <0.7.0;
 // pragma abicoder v2;
 pragma experimental ABIEncoderV2;
 
@@ -32,19 +32,23 @@ contract Ballot {
     mapping(address => Lib.Voting) voting;
     
     // ["fist", "second"]
-    constructor(bytes32 question, bytes32[] memory proposalNames) public {
+    constructor() public {
     // constructor(string memory test) {
-        _proposals = proposalNames;
-        _question = question;
+        // _proposals = proposalNames;
+        //_question = question;
         // _test = bytes32(test);
+        
+        _proposals.push("111");
+        _proposals.push("222");
+        _proposals.push("333");
 
         owner = msg.sender;
         
-        for (uint i = 0; i < proposalNames.length; i++) {
+        for (uint i = 0; i < _proposals.length; i++) {
             _proposalsStruct.push(Proposal({
                 id: i,
                 // name: stringToBytes32(proposalNames[i]),
-                name: proposalNames[i],
+                name: _proposals[i],
                 count: 0
             }));
         }
@@ -55,11 +59,10 @@ contract Ballot {
         
         _proposalsStruct[id].count++;
         voting[msg.sender].proposalId = id;
-        voting[msg.sender].exist = true;
     }
 
-    function getVotingStatus() public view returns(bool) {
-      return voting[msg.sender].exist;
+    function getVotingStatus() public view returns(uint8) {
+      return voting[msg.sender].proposalId;
     }
     
     function getTest() public view returns(bytes32) {
@@ -77,12 +80,6 @@ contract Ballot {
     function getProposal(uint id) public view returns(Proposal memory) {
         require(id <= _proposalsStruct.length, 'Error1');
         return _proposalsStruct[id];
-    }
-
-    function setTestData() public {
-      for (uint8 i = 0; i < _proposalsStruct.length; i++) {
-        _proposalsStruct[i].count = i % 2 == 0 ? 4 : 2;
-      }
     }
 
     // function getProposalName(uint id) public view returns(string memory) {
